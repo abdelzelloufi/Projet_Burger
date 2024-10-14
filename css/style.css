@@ -89,7 +89,6 @@ body {
 .admin{
 
     padding: 80px;
-    background: whitesmoke;
+    background-color: whitesmoke;
     border-radius: 10px;
-    color: #fff;
 }

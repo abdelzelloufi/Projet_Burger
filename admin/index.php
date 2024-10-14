@@ -17,7 +17,7 @@
         <div class="container admin">
             <div class="row">
                 <h1><strong>Liste des items   </strong><a href="insert.php" class="btn btn-success btn-lg"><span class="bi-plus"></span> Ajouter</a></h1>
-                <table class="table table-striped table-bordered">
+                <table class="table table-striped table-dark table-hover">
                   <thead>
                     <tr>
                       <th>Nom</th>
@@ -28,28 +28,30 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>Item 1</td>
-                      <td>Description 1</td>
-                      <td>Prix 1</td>
-                      <td>Catégorie 1</td>
-                      <td width=340>
-                        <a class="btn btn-secondary" href="view.php?id=1"><span class="bi-eye"></span> Voir</a>
-                        <a class="btn btn-primary" href="update.php?id=1"><span class="bi-pencil"></span> Modifier</a>
-                        <a class="btn btn-danger" href="delete.php?id=1"><span class="bi-x"></span> Supprimer</a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Item 2</td>
-                      <td>Description 2</td>
-                      <td>Prix 2</td>
-                      <td>Catégorie 2</td>
-                      <td width=340>
-                        <a class="btn btn-secondary" href="view.php?id=2"><span class="bi-eye"></span> Voir</a>
-                        <a class="btn btn-primary" href="update.php?id=2"><span class="bi-pencil"></span> Modifier</a>
-                        <a class="btn btn-danger" href="delete.php?id=2"><span class="bi-x"></span> Supprimer</a>
-                      </td>
-                    </tr>
+                    <?php
+                    
+                      require 'database.php';
+                      $db = Database::connect();
+                      $statement = $db->query('SELECT items.id, items.name, items.description, items.price, categories.name AS category FROM items LEFT JOIN categories ON items.category=categories.id ORDER BY items.id DESC');
+                      while($item=$statement->fetch()){
+                        echo '<tr>';
+                        echo '<td>'.$item['name'].'</td>';
+                        echo '<td>'.$item['description'].'</td>';
+                        echo '<td  width=67px>'.number_format((float)$item['price'], 2, '.', '') .' €</td>';
+                        echo '<td>'.$item['category'] .'</td>';
+                        echo '<td width=340>';
+                        echo '<a class="btn btn-secondary" href="view.php?id='.$item['id'].'"><span class="bi-eye"></span> Voir</a>';
+                        echo ' ';
+                        echo '<a class="btn btn-primary" href="update.php?id='.$item['id'].'"><span class="bi-pencil"></span> Modifier</a>';
+                        echo ' ';
+                        echo '<a class="btn btn-danger" href="delete.php?id='.$item['id'].'"><span class="bi-x"></span> Supprimer</a>';
+                        echo ' ';
+                        echo '</td>';
+                        echo '</tr>';
+
+                      }
+                      Database::disconnect();
+                    ?>
                   </tbody>
                 </table>
             </div>
