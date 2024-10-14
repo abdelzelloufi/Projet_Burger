@@ -83,3 +83,13 @@ body {
     color: #fff;
     background-color: #c13c0d;
 }
+
+/*ADMIN*/
+
+.admin{
+
+    padding: 80px;
+    background: whitesmoke;
+    border-radius: 10px;
+    color: #fff;
+}
