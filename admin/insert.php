@@ -1,71 +1,82 @@
 <?php
-     
+    // Inclusion du fichier de connexion à la base de données
     require 'database.php';
- 
+
+    // Initialisation des variables d'erreur et des champs de formulaire
     $nameError = $descriptionError = $priceError = $categoryError = $imageError = $name = $description = $price = $category = $image = "";
 
-    if(!empty($_POST)) {
+    // Vérifie si le formulaire a été soumis
+    if (!empty($_POST)) {
+        // Traitement des entrées de formulaire avec la fonction checkInput pour sécuriser les données
         $name               = checkInput($_POST['name']);
         $description        = checkInput($_POST['description']);
         $price              = checkInput($_POST['price']);
         $category           = checkInput($_POST['category']); 
         $image              = checkInput($_FILES["image"]["name"]);
         $imagePath          = '../images/'. basename($image);
-        $imageExtension     = pathinfo($imagePath,PATHINFO_EXTENSION);
+        $imageExtension     = pathinfo($imagePath, PATHINFO_EXTENSION);
         $isSuccess          = true;
         $isUploadSuccess    = false;
         
-        if(empty($name)) {
+        // Vérification des champs obligatoires
+        if (empty($name)) {
             $nameError = 'Ce champ ne peut pas être vide';
             $isSuccess = false;
         }
-        if(empty($description)) {
+        if (empty($description)) {
             $descriptionError = 'Ce champ ne peut pas être vide';
             $isSuccess = false;
         } 
-        if(empty($price)) {
+        if (empty($price)) {
             $priceError = 'Ce champ ne peut pas être vide';
             $isSuccess = false;
         } 
-        if(empty($category)) {
+        if (empty($category)) {
             $categoryError = 'Ce champ ne peut pas être vide';
             $isSuccess = false;
         }
-        if(empty($image)) {
+        if (empty($image)) {
             $imageError = 'Ce champ ne peut pas être vide';
             $isSuccess = false;
         }
         else {
             $isUploadSuccess = true;
-            if($imageExtension != "jpg" && $imageExtension != "png" && $imageExtension != "jpeg" && $imageExtension != "gif" ) {
+            // Vérification de l'extension du fichier image
+            if ($imageExtension != "jpg" && $imageExtension != "png" && $imageExtension != "jpeg" && $imageExtension != "gif" ) {
                 $imageError = "Les fichiers autorises sont: .jpg, .jpeg, .png, .gif";
                 $isUploadSuccess = false;
             }
-            if(file_exists($imagePath)) {
-                $imageError = "Le fichier existe deja";
+            // Vérifie si le fichier existe déjà
+            if (file_exists($imagePath)) {
+                $imageError = "Le fichier existe déjà";
                 $isUploadSuccess = false;
             }
-            if($_FILES["image"]["size"] > 500000) {
-                $imageError = "Le fichier ne doit pas depasser les 500KB";
+            // Vérification de la taille maximale du fichier
+            if ($_FILES["image"]["size"] > 500000) {
+                $imageError = "Le fichier ne doit pas dépasser les 500KB";
                 $isUploadSuccess = false;
             }
-            if($isUploadSuccess) {
-                if(!move_uploaded_file($_FILES["image"]["tmp_name"], $imagePath)) {
+            // Tentative de déplacement du fichier uploadé
+            if ($isUploadSuccess) {
+                if (!move_uploaded_file($_FILES["image"]["tmp_name"], $imagePath)) {
                     $imageError = "Il y a eu une erreur lors de l'upload";
                     $isUploadSuccess = false;
                 } 
             } 
         }
         
-        if($isSuccess && $isUploadSuccess) {
+        // Si toutes les vérifications sont réussies, insertion des données dans la base
+        if ($isSuccess && $isUploadSuccess) {
             $db = Database::connect();
-            $statement = $db->prepare("INSERT INTO items (name,description,price,category,image) values(?, ?, ?, ?, ?)");
-            $statement->execute(array($name,$description,$price,$category,$image));
+            $statement = $db->prepare("INSERT INTO items (name, description, price, category, image) VALUES (?, ?, ?, ?, ?)");
+            $statement->execute(array($name, $description, $price, $category, $image));
             Database::disconnect();
+            // Redirection vers la page d'accueil après l'insertion
             header("Location: index.php");
         }
     }
 
+    // Fonction pour nettoyer les entrées utilisateur
     function checkInput($data) {
       $data = trim($data);
       $data = stripslashes($data);

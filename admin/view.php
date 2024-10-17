@@ -1,24 +1,36 @@
 <?php
+    // Inclusion du fichier de connexion à la base de données
     require 'database.php';
 
-    if(!empty($_GET['id'])) {
+    // Vérifie si un identifiant a été passé en paramètre GET
+    if (!empty($_GET['id'])) {
+        // Utilise la fonction checkInput pour sécuriser l'entrée
         $id = checkInput($_GET['id']);
     }
      
+    // Connexion à la base de données
     $db = Database::connect();
-    $statement = $db->prepare("SELECT items.id, items.name, items.description, items.price, items.image, categories.name AS category FROM items LEFT JOIN categories ON items.category = categories.id WHERE items.id = ?");
+    // Préparation de la requête SQL pour récupérer les détails de l'élément spécifié par l'id
+    $statement = $db->prepare("SELECT items.id, items.name, items.description, items.price, items.image, categories.name AS category 
+                               FROM items 
+                               LEFT JOIN categories ON items.category = categories.id 
+                               WHERE items.id = ?");
+    // Exécution de la requête avec l'id comme paramètre
     $statement->execute(array($id));
+    // Récupère les résultats de la requête
     $item = $statement->fetch();
+    // Déconnexion de la base de données
     Database::disconnect();
 
+    // Fonction pour nettoyer et sécuriser les données d'entrée
     function checkInput($data) {
-      $data = trim($data);
-      $data = stripslashes($data);
-      $data = htmlspecialchars($data);
-      return $data;
+        $data = trim($data); // Supprime les espaces en début et fin de chaîne
+        $data = stripslashes($data); // Supprime les antislashes
+        $data = htmlspecialchars($data); // Convertit les caractères spéciaux en entités HTML
+        return $data;
     }
-
 ?>
+
 
 <!DOCTYPE html>
 <html>
